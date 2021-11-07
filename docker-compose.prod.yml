@@ -1,0 +1,18 @@
+version: "3.8"
+
+services:
+  backend:
+    build:
+      context: ./backend
+      target: prod
+    environment:
+      - ENV=production
+    expose:
+      - 8081
+
+  frontend:
+    build: 
+      context: ./frontend
+      target: prod
+    ports:
+      - "8080:8080"
