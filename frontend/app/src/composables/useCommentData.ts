@@ -1,0 +1,82 @@
+import { ref } from 'vue'
+import { ClassLabels } from '@/models'
+import type {
+  Classification,
+  Subclass,
+  Comment,
+  CommentDetails,
+} from '@/models'
+
+export function useCommentData() {
+  const comment = ref('')
+  const tags = ref('')
+  const classification = ref<Classification | null>(null)
+  const showModal = ref(false)
+
+  const getTags = (comment: Classification): string => {
+    const tags = []
+
+    if (comment.toxic.assigned === false) return ClassLabels.good
+
+    for (const field in comment) {
+      if (
+        Object.prototype.hasOwnProperty.call(comment, field) &&
+        comment[field as Subclass].assigned === true
+      )
+        tags.push(ClassLabels[field as Subclass])
+    }
+    return tags.join(', ')
+  }
+
+  const mapToPlotData = (comments: Comment[]): Partial<Plotly.Data> => {
+    return {
+      // ids: comments.map((c) => c.comment), // TODO nadawać idki do refresha - ma byc string !!!
+      x: comments.map((c) => c.position.x),
+      y: comments.map((c) => c.position.y),
+      customdata: comments.map((c) =>
+        JSON.stringify({
+          text: c.text,
+          tags: getTags(c.classification),
+          classification: c.classification,
+        } as CommentDetails)
+      ),
+    }
+  }
+
+  const subscribeToPlotEvents = (chart: Plotly.PlotlyHTMLElement) => {
+    chart.on('plotly_hover', (data) => {
+      const point = data.points[0]
+      const pointData = JSON.parse(point.customdata as string) as CommentDetails
+
+      tags.value = pointData.tags
+      comment.value = pointData.text
+      classification.value = pointData.classification
+    })
+
+    chart.on('plotly_click', (data) => {
+      const point = data.points[0]
+      const pointData = JSON.parse(point.customdata as string) as CommentDetails
+
+      tags.value = pointData.tags
+      comment.value = pointData.text
+      classification.value = pointData.classification
+      showModal.value = true
+    })
+
+    chart.on('plotly_unhover', () => {
+      tags.value = ''
+      comment.value = ''
+      classification.value = null
+    })
+  }
+
+  return {
+    comment,
+    tags,
+    classification,
+    showModal,
+    getTags,
+    mapToPlotData,
+    subscribeToPlotEvents,
+  }
+}
