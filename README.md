@@ -1,4 +1,5 @@
 # WWZD
+
 Big data visualisations
 
 ## How to start the project
@@ -20,6 +21,3 @@ docker-compose -f docker-compose.prod.yml up
 
 Access the frontend on http://localhost:8080
 Access the backend from vue on http://localhost:8080/api (swagger not exposed)
-
-
-

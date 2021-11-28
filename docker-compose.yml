@@ -4,9 +4,10 @@ services:
   backend:
     build:
       context: ./backend
-      target: dev
+      target: base
+    command: "python app.py"
     volumes:
-      - './backend:/app'
+      - "./backend:/app"
     environment:
       - ENV=development
     ports:
@@ -15,11 +16,11 @@ services:
       - 8081
 
   frontend:
-    build: 
+    build:
       context: ./frontend
       target: dev
-    volumes: 
-      - './frontend/app/:/app'
+    volumes:
+      - "./frontend/app/:/app"
     ports:
       - "8080:8080"
-    command: "npm run serve"
+    command: "npm run dev"
