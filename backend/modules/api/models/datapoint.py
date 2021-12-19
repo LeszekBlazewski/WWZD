@@ -1,8 +1,10 @@
-from .comments import api
-from flask_restx import fields
+from flask_restx import Namespace, fields
 
+dataset_api = Namespace(
+    "datasets", description="All operations regarding available datasets"
+)
 
-position_field = api.model(
+position_field = dataset_api.model(
     "Position",
     {
         "x": fields.Float(
@@ -16,7 +18,7 @@ position_field = api.model(
     },
 )
 
-classification_field = api.model(
+classification_field = dataset_api.model(
     "Classification",
     {
         "toxic": fields.Boolean(
@@ -40,10 +42,10 @@ classification_field = api.model(
     },
 )
 
-comment_model = api.model(
-    "Comment",
+data_point = dataset_api.model(
+    "DataPoint",
     {
-        "comment": fields.String(
+        "text": fields.String(
             required=True, description="The actual text that was classified"
         ),
         "position": fields.Nested(position_field),

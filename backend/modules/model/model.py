@@ -1,9 +1,8 @@
 import torch
 import numpy as np
-from backend.model.bert import BertForMultiLabelSequenceClassification
-from backend.model.model_inputs import InputExample, InputFeatures
+from .bert import BertForMultiLabelSequenceClassification
+from .model_inputs import InputExample, InputFeature
 from torch.utils.data import TensorDataset, DataLoader, SequentialSampler
-from app import app
 
 
 class Model:
@@ -11,49 +10,52 @@ class Model:
         self,
         tokenizer_instance: torch.Module,
         pretrained_model_instance: BertForMultiLabelSequenceClassification,
+        eval_batch_size: int,
+        max_seq_length: int,
+        label_list: list[str],
+        use_cpu: bool = True,
     ):
         # 1. set the appropriate parameters
-        self.eval_batch_size = app.config.MODEL_BATCH_SIZE
-        self.max_seq_length = app.config.MODEL_MAX_SEQUENCE_LENGTH
-        self.label_list = app.config.LABEL_LIST
+        self.eval_batch_size = eval_batch_size
+        self.max_seq_length = max_seq_length
+        self.label_list = label_list
+        self.use_cpu = use_cpu
 
         # 2. Initialize the PyTorch model based on passed model and tokenizer instance
         self.tokenizer = tokenizer_instance
         self.model = pretrained_model_instance
 
-        self.device = torch.device("cpu")
-        self.model.to(self.device)
+        if self.use_cpu:
+            self.device = torch.device("cpu")
+            self.model.to(self.device)
+        else:
+            self.model.cuda()
 
         # 3. Set the layers to evaluation mode
         self.model.eval()
 
-    def pre_process(self, input):
+    def _pre_process(self, input: list[str]):
         # Converting the input to features
-        test_examples = [InputExample(guid=i, text_a=x) for i, x in enumerate(input)]
-        test_features = self.convert_examples_to_features(
-            test_examples, self.max_seq_length, self.tokenizer
+        examples = [InputExample(guid=i, text_a=x) for i, x in enumerate(input)]
+        features = self.convert_examples_to_features(
+            examples, self.max_seq_length, self.tokenizer
         )
 
-        all_input_ids = torch.tensor(
-            [f.input_ids for f in test_features], dtype=torch.long
-        )
+        all_input_ids = torch.tensor([f.input_ids for f in features], dtype=torch.long)
         all_input_mask = torch.tensor(
-            [f.input_mask for f in test_features], dtype=torch.long
+            [f.input_mask for f in features], dtype=torch.long
         )
         all_segment_ids = torch.tensor(
-            [f.segment_ids for f in test_features], dtype=torch.long
+            [f.segment_ids for f in features], dtype=torch.long
         )
 
         # Turn input examples into batches
-        test_data = TensorDataset(all_input_ids, all_input_mask, all_segment_ids)
-        test_sampler = SequentialSampler(test_data)
-        self.test_dataloader = DataLoader(
-            test_data, sampler=test_sampler, batch_size=self.eval_batch_size
-        )
+        data = TensorDataset(all_input_ids, all_input_mask, all_segment_ids)
+        sampler = SequentialSampler(data)
+        dataloader = DataLoader(data, sampler=sampler, batch_size=self.eval_batch_size)
+        return dataloader
 
-        return test_examples
-
-    def post_process(self, result):
+    def _post_process(self, result: np.ndarray):
         """Convert the prediction output to the expected output."""
         # Generate the output format for every input string
         output = [
@@ -70,17 +72,24 @@ class Model:
 
         return output
 
-    def predict(self):
+    def predict(self, input: list[str]):
         """Predict the class probabilities using the BERT model."""
+
+        dataloader = self._pre_process(input)
         all_logits = None
         all_pooled_outputs = None
 
-        for _, batch in enumerate(self.test_dataloader):
+        for _, batch in enumerate(dataloader):
             input_ids, input_mask, segment_ids = batch
 
-            input_ids = input_ids.to(self.device)
-            input_mask = input_mask.to(self.device)
-            segment_ids = segment_ids.to(self.device)
+            if self.use_cpu:
+                input_ids = input_ids.to(self.device)
+                input_mask = input_mask.to(self.device)
+                segment_ids = segment_ids.to(self.device)
+            else:
+                input_ids = input_ids.cuda()
+                input_mask = input_mask.cuda()
+                segment_ids = segment_ids.cuda()
 
             # Compute the logits
             with torch.no_grad():
@@ -99,13 +108,16 @@ class Model:
                     (all_pooled_outputs, pooled_output.detach().cpu().numpy()), axis=0
                 )
 
+        encoded_predictions = self._post_process(all_logits)
         # Return the last layer outputs and predictions
-        return (all_pooled_outputs, all_logits)
+        return (all_pooled_outputs, encoded_predictions)
 
-    def convert_examples_to_features(examples, max_seq_length, tokenizer):
+    def convert_examples_to_features(
+        self, examples: list[InputExample], max_seq_length: int, tokenizer
+    ) -> list[InputFeature]:
         """Loads a data file into a list of `InputBatch`s."""
 
-        features = []
+        features: list[InputFeature] = []
         for (_, example) in enumerate(examples):
             tokens_a = tokenizer.tokenize(str(example.text_a))
 
@@ -147,7 +159,7 @@ class Model:
             segment_ids += padding
 
             features.append(
-                InputFeatures(
+                InputFeature(
                     input_ids=input_ids, input_mask=input_mask, segment_ids=segment_ids
                 )
             )

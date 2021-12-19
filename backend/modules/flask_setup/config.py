@@ -5,7 +5,10 @@ class Config(object):
     HOST = "0.0.0.0"
     PORT = "8081"
     ENV = os.getenv("ENV")
-    MODEL_PATH = os.getenv("MODEL_PATH") # From Dockerfile
+    MODELS_PATH = os.getenv("MODELS_PATH")  # From Dockerfile
+    # DATASETS_PATH = os.getenv("DATASETS_PATH")  # From Dockerfile
+    DATASETS_PATH = "./datasets"
+    USE_CPU = True
 
 
 class DevelopmentConfig(Config):

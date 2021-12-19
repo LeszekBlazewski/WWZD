@@ -1,4 +1,4 @@
-from types import UnionType
+from typing import Union
 
 
 class InputExample(object):
@@ -9,12 +9,12 @@ class InputExample(object):
         self.text_a = text_a
 
 
-class InputFeatures(object):
+class InputFeature(object):
     """A single set of features of data."""
 
     def __init__(
         self,
-        input_ids: UnionType[str, list[str]],
+        input_ids: Union[str, list[str]],
         input_mask: list[int],
         segment_ids: list[int],
     ):

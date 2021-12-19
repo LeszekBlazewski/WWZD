@@ -1,9 +1,9 @@
-from typing import _TypedDict
+from typing import TypedDict
 from pytorch_pretrained_bert.modeling import BertPreTrainedModel, BertModel
 import torch
 
 
-class BertConfig(_TypedDict):
+class BertConfig(TypedDict):
     attention_probs_dropout_prob: float
     hidden_act: str
     hidden_dropout_prob: float
@@ -21,8 +21,8 @@ class BertForMultiLabelSequenceClassification(BertPreTrainedModel):
     def __init__(self, config: BertConfig, num_labels: int):
         super().__init__(config)
         self.bert = BertModel(config)
-        self.dropout = torch.nn.Dropout(config.hidden_dropout_prob)
-        self.classifier = torch.nn.Linear(config.hidden_size, num_labels)
+        self.dropout = torch.nn.Dropout(config["hidden_dropout_prob"])
+        self.classifier = torch.nn.Linear(config["hidden_size"], num_labels)
         self.apply(self.init_bert_weights)
 
     def forward(self, input_ids, token_type_ids=None, attention_mask=None):
