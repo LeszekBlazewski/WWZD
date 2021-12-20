@@ -15,6 +15,12 @@ parser.add_argument(
     type=str,
     help="Name of algorithm that should be used to locate given sample",
 )
+parser.add_argument(
+    "text",
+    required=True,
+    type=str,
+    help="Text which should be classified",
+)
 
 
 @classification_api.route("/")
@@ -25,13 +31,14 @@ class ClassificationResource(Resource):
     def post(self):
         request_args = parser.parse_args()
         algorithm = request_args["algorithm"].upper()
+        text = request_args["text"]
         # TODO: Use our bert model + pca/umap to classify and return the sample
         return (
             {
-                "text": "Explanation\nWhy the edits made under my username Hardcore Metallica Fan were reverted? They weren't vandalisms, just closure on some GAs after I voted at New York Dolls FAC. And please don't remove the template from the talk page since I'm retired now.89.205.38.27",
+                "text": text,
                 "position": {"x": -3.3748245, "y": -0.37758058},
                 "classification": {
-                    "toxic": False,
+                    "toxic": True,
                     "severeToxic": False,
                     "obscene": False,
                     "threat": False,
