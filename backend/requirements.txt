@@ -1,4 +1,4 @@
-# TODO: validate if objects loaded with pickle need dependencies installed (clear the list)
+# TODO: validate if objects loaded with pickle need dependencies installed (clear the list) + check if python 3.10 can be used (update swtich case and typing)
 # umap needed?
 # scikit needed?
 # umap-learn==0.5.2

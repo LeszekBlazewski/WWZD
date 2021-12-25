@@ -42,7 +42,7 @@ classification_field = dataset_api.model(
     },
 )
 
-data_point = dataset_api.model(
+data_point_model = dataset_api.model(
     "DataPoint",
     {
         "text": fields.String(
@@ -50,5 +50,16 @@ data_point = dataset_api.model(
         ),
         "position": fields.Nested(position_field),
         "classification": fields.Nested(classification_field),
+    },
+)
+
+dataset_model = dataset_api.model(
+    "Dataset",
+    {
+        "name": fields.String(required=True, description="Name of the dataset"),
+        "samples": fields.Integer(
+            allow_null=True,
+            description="Total number of samples in the dataset, If dataset isn't loaded will be null",
+        ),
     },
 )

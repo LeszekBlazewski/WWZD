@@ -1,6 +1,6 @@
 from flask_restx import Api
-from .apis.classification import classification_api
-from .apis.dataset import dataset_api
+from .apis.classification_api import classification_api
+from .apis.dataset_api import dataset_api
 
 api = Api(
     title="Toxic API",

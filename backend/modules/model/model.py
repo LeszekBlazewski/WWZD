@@ -3,6 +3,8 @@ import numpy as np
 from .bert import BertForMultiLabelSequenceClassification
 from .model_inputs import InputExample, InputFeature
 from torch.utils.data import TensorDataset, DataLoader, SequentialSampler
+from pytorch_pretrained_bert.tokenization import BertTokenizer
+from ..flask_setup.flask import app
 
 
 class Model:
@@ -55,7 +57,7 @@ class Model:
         dataloader = DataLoader(data, sampler=sampler, batch_size=self.eval_batch_size)
         return dataloader
 
-    def _post_process(self, result: np.ndarray):
+    def _post_process(self, result):
         """Convert the prediction output to the expected output."""
         # Generate the output format for every input string
         output = [
@@ -164,3 +166,30 @@ class Model:
                 )
             )
         return features
+
+
+tokenizer_instance = BertTokenizer.from_pretrained(
+    app.config["BERT_MODEL_PATH"], do_lower_case=True
+)
+
+if app.config["USE_CPU"]:
+    model_state_dict = torch.load(
+        f"{app.config['BERT_MODEL_PATH']}/pytorch_model.bin", map_location="cpu"
+    )
+else:
+    model_state_dict = torch.load(f"{app.config['BERT_MODEL_PATH']}/pytorch_model.bin")
+
+pretrained_model_instance = BertForMultiLabelSequenceClassification.from_pretrained(
+    app.config["BERT_MODEL_PATH"],
+    num_labels=len(app.config["LABEL_LIST"]),
+    state_dict=model_state_dict,
+)
+
+model = Model(
+    tokenizer_instance,
+    pretrained_model_instance,
+    app.config["BATCH_SIZE"],
+    app.config["MAX_SEQ_LENGTH"],
+    app.config["LABEL_LIST"],
+    app.config["USE_CPU"],
+)
