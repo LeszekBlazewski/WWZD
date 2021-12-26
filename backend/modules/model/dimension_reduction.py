@@ -1,4 +1,3 @@
-from ..flask_setup.flask import app
 import pickle
 
 

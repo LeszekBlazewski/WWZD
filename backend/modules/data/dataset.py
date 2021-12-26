@@ -3,7 +3,7 @@ from typing import Dict, Union
 import pickle
 
 
-class DatasetAlgorithm(Enum):
+class DatasetAlgorithmEnum(Enum):
     PCA = "pca"
     UMAP = "umap"
 

@@ -10,7 +10,7 @@ from ..flask_setup.flask import app
 class Model:
     def __init__(
         self,
-        tokenizer_instance: torch.Module,
+        tokenizer_instance,
         pretrained_model_instance: BertForMultiLabelSequenceClassification,
         eval_batch_size: int,
         max_seq_length: int,

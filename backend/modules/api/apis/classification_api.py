@@ -1,6 +1,6 @@
 from flask_restx import Namespace, Resource, reqparse
 from .dataset_api import data_point_model
-from ...data.data_loader import DatasetAlgorithm
+from ...data.data_loader import DatasetAlgorithmEnum
 from ...model.model import model
 from ...model.dimension_reduction_loader import reduction_models_loader
 from ...flask_setup.flask import app
@@ -13,7 +13,7 @@ classification_api = Namespace(
 parser = reqparse.RequestParser()
 parser.add_argument(
     "algorithm",
-    choices=DatasetAlgorithm.list_all(),
+    choices=DatasetAlgorithmEnum.list_all(),
     required=True,
     type=str,
     help="Name of algorithm that should be used to locate given sample",

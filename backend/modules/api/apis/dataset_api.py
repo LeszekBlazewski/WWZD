@@ -1,4 +1,5 @@
-from ...data.data_loader import data_loader, DatasetAlgorithm
+from ...data.data_loader import data_loader, DatasetAlgorithmEnum
+from ...model.dimension_reduction_loader import reduction_models_loader
 from ...data.exceptions import WrongAlgorithmException, WrongDatasetException
 from flask_restx import Resource, reqparse
 from ..models.data_models import data_point_model, dataset_model, dataset_api
@@ -10,14 +11,27 @@ def handle_wrong_param_exception(error):
     return {"message": error.message}, 400
 
 
+# TODO: Fix this check how the loop works
 @dataset_api.route("/")
 class DatasetResource(Resource):
     @dataset_api.doc("List available datasets")
     @dataset_api.marshal_list_with(dataset_model)
     def get(self):
         reduced_datasets = []
-        for name, value in data_loader.get_datasets().items():
-            reduced_datasets.append({"name": name, "samples": value["samples"]})
+        datasets = data_loader.get_datasets()
+        reduction_models = reduction_models_loader.get_models()
+        for key in datasets.keys() & reduction_models.keys():
+            # we simply take number of samples from first dataset of model (all have same number of samples)
+            samples_count = list(datasets[key].values())[0].samples_count
+            reduced_datasets.append(
+                {
+                    "name": key,
+                    "samplesCount": samples_count,
+                    "availableReductionModels": [
+                        m for m in reduction_models[key].keys()
+                    ],
+                }
+            )
         return reduced_datasets
 
 
@@ -25,7 +39,7 @@ parser = reqparse.RequestParser()
 
 parser.add_argument(
     "algorithm",
-    choices=DatasetAlgorithm.list_all(),
+    choices=DatasetAlgorithmEnum.list_all(),
     required=True,
     type=str,
     help="Name of algorithm that has been used for dataset",
@@ -45,7 +59,7 @@ parser_dataset_load = reqparse.RequestParser()
 
 parser_dataset_load.add_argument(
     "algorithm",
-    choices=[DatasetAlgorithm.list_all(), None],
+    choices=[DatasetAlgorithmEnum.list_all(), None],
     type=str,
     help="Name of algorithm that has been used for dataset. If None datapoints for all available models will be loaded",
 )
@@ -69,7 +83,7 @@ class DataPointResource(Resource):
         start = request_args["start"]
         stop = request_args["stop"]
         dataset_data = data_loader.get_classification_dataset(
-            dataset_name, DatasetAlgorithm[algorithm]
+            dataset_name, DatasetAlgorithmEnum[algorithm]
         )
         return dataset_data[start:stop]
 

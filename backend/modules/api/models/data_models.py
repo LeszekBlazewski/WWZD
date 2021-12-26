@@ -18,27 +18,27 @@ position_field = dataset_api.model(
     },
 )
 
+class_field = dataset_api.model(
+    "Class",
+    {
+        "assigned": fields.Boolean(
+            required=True, description="Was the comment classified in this class?"
+        ),
+        "prediction": fields.Float(
+            required=True, description="Prediction given from model in %"
+        ),
+    },
+)
+
 classification_field = dataset_api.model(
     "Classification",
     {
-        "toxic": fields.Boolean(
-            required=True, description="Is the comment classified as toxic?"
-        ),
-        "severeToxic": fields.Boolean(
-            required=True, description="Is the comment classified as severeToxic?"
-        ),
-        "obscene": fields.Boolean(
-            required=True, description="Is the comment classified as obscene?"
-        ),
-        "threat": fields.Boolean(
-            required=True, description="Is the comment classified as threat?"
-        ),
-        "insult": fields.Boolean(
-            required=True, description="Is the comment classified as insult?"
-        ),
-        "identityHate": fields.Boolean(
-            required=True, description="Is the comment classified as identityHate?"
-        ),
+        "toxic": fields.Nested(class_field),
+        "severeToxic": fields.Nested(class_field),
+        "obscene": fields.Nested(class_field),
+        "threat": fields.Nested(class_field),
+        "insult": fields.Nested(class_field),
+        "identityHate": fields.Nested(class_field),
     },
 )
 
@@ -57,9 +57,13 @@ dataset_model = dataset_api.model(
     "Dataset",
     {
         "name": fields.String(required=True, description="Name of the dataset"),
-        "samples": fields.Integer(
+        "samplesCount": fields.Integer(
             allow_null=True,
             description="Total number of samples in the dataset, If dataset isn't loaded will be null",
+        ),
+        "availableReductionModels": fields.List(
+            fields.String,
+            description="List of available reduction algo for given dataset",
         ),
     },
 )
