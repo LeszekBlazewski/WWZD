@@ -1,15 +1,6 @@
-from enum import Enum
+from __future__ import annotations
 from typing import Dict, Union
 import pickle
-
-
-class DatasetAlgorithmEnum(Enum):
-    PCA = "pca"
-    UMAP = "umap"
-
-    @classmethod
-    def list_all(cls):
-        return list(map(lambda c: c.value, cls))
 
 
 class Dataset(object):

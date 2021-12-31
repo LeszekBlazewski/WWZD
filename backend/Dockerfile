@@ -1,18 +1,18 @@
-FROM python:3.9-slim-buster as base
+FROM python:3.7-slim-buster as base
 
 WORKDIR /app
 
 COPY requirements.txt .
 RUN pip install --no-cache-dir --upgrade pip && pip install --no-cache-dir -r requirements.txt
 
-ARG MODEL_ADDRESS=https://drive.google.com/uc?id=1KxdXfduzTdl2n7JDB-ZomYxP6Zx5yVLE
-ARG DATASETS_ADDRESS=https://drive.google.com/uc?id=1Y1E-WjcEHygYUdcrqGUKlIdZcrVcrPD0
-ENV MODEL_PATH=/assets/model
-ENV DATASETS_PATH=/assets/datasets
+ARG MODEL_ADDRESS=https://drive.google.com/uc?id=19CtF7rICsT0bbpisbn1t5CIxHG1USxh4
+ARG DATASETS_ADDRESS=https://drive.google.com/uc?id=1-DXzWHkkFd2EkCIC4dTBrDBoLbWSR0oS
+ENV ASSETS_PATH=/assets
+ENV DATASETS_PATH=${ASSETS_PATH}/datasets
 ENV PYTHONUNBUFFERED=1
 
-RUN mkdir -p ${MODEL_PATH} ${DATASETS_PATH} && \
-    cd ${MODEL_PATH} && \
+RUN mkdir -p ${ASSETS_PATH} ${DATASETS_PATH} && \
+    cd ${ASSETS_PATH} && \
     # download bert model
     gdown ${MODEL_ADDRESS} -O - --quiet | tar zxvf - && \
     cd ${DATASETS_PATH} && \

@@ -1,14 +1,13 @@
-from .typing import BertConfig
 from pytorch_pretrained_bert.modeling import BertPreTrainedModel, BertModel
 import torch
 
 
 class BertForMultiLabelSequenceClassification(BertPreTrainedModel):
-    def __init__(self, config: BertConfig, num_labels: int):
+    def __init__(self, config, num_labels: int):
         super().__init__(config)
         self.bert = BertModel(config)
-        self.dropout = torch.nn.Dropout(config["hidden_dropout_prob"])
-        self.classifier = torch.nn.Linear(config["hidden_size"], num_labels)
+        self.dropout = torch.nn.Dropout(config.hidden_dropout_prob)
+        self.classifier = torch.nn.Linear(config.hidden_size, num_labels)
         self.apply(self.init_bert_weights)
 
     def forward(self, input_ids, token_type_ids=None, attention_mask=None):

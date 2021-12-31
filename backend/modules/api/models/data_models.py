@@ -1,4 +1,5 @@
 from flask_restx import Namespace, fields
+from ...data.data_loader import data_loader
 
 dataset_api = Namespace(
     "datasets", description="All operations regarding available datasets"
@@ -63,7 +64,30 @@ dataset_model = dataset_api.model(
         ),
         "availableReductionModels": fields.List(
             fields.String,
-            description="List of available reduction algo for given dataset",
+            description="List of available reduction models for given dataset",
+        ),
+    },
+)
+
+dataset_load_input = dataset_api.model(
+    "DatasetLoadInput",
+    {
+        "datasetName": fields.String(
+            required=True,
+            description=f"Name of dataset to load from: {data_loader.get_dataset_names()}",
+        ),
+        "availableReductionModel": fields.String(
+            description="Name of the algorithm from /datasets endpoint which was used to reduce data dimension. If empty all of the reduction models will be loaded",
+        ),
+    },
+)
+
+dataset_load_response = dataset_api.model(
+    "DatasetLoadResponse",
+    {
+        "datasetDetails": fields.Nested(dataset_model),
+        "status": fields.String(
+            description="'partial' if only given reduction model loaded 'all' if all models loaded"
         ),
     },
 )

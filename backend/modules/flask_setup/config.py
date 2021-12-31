@@ -17,12 +17,11 @@ class Config(object):
     PREALOAD_DATASETS = True  # If all datasets should be loaded at start
     BATCH_SIZE = 64  # when loading data to classify, how big should the batches be
     MAX_SEQ_LENGTH = 256  # what is the maximal character length of one sample
-    MODELS_PATH = os.getenv("MODELS_PATH")  # From Dockerfile
-    # TODO: Fix this  DATASETS_PATH = os.getenv("DATASETS_PATH")  # From Dockerfile
-    DATASETS_PATH = "./datasets"
-    # Based on the tar repository from google drive
-    BERT_MODEL_PATH = f"{MODELS_PATH}/bert"
-    DIMENSION_REDUCTION_MODELS_PATH = f"{MODELS_PATH}/dimension_reduction"
+    ASSETS_PATH = os.getenv("ASSETS_PATH")  # From Dockerfile
+    DATASETS_PATH = os.getenv("DATASETS_PATH")  # From Dockerfile
+    # Based on the tar archive strśucture from google drive
+    BERT_MODEL_PATH = f"{ASSETS_PATH}/bert"
+    SWAGGER_UI_DOC_EXPANSION = "list"
 
 
 class DevelopmentConfig(Config):
