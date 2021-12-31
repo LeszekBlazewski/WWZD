@@ -1,7 +1,9 @@
 flask-restx==0.5.1
 Flask-Cors==3.0.10
-scikit-learn==1.0.1
-torch==1.10.0
-pytorch-pretrained-bert==0.6.2
-umap-learn==0.5.2
 gdown==4.2.0
+scikit-learn==1.0.1
+pytorch-pretrained-bert==0.6.2
+numba==0.51.2
+umap-learn==0.5.2
+torch==1.10.0
+

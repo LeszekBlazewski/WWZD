@@ -5,6 +5,7 @@ services:
     build:
       context: ./backend
       target: base
+    restart: unless-stopped
     command: "python app.py"
     volumes:
       - "./backend:/app"
@@ -19,6 +20,7 @@ services:
     build:
       context: ./frontend
       target: dev
+    restart: unless-stopped
     volumes:
       - "./frontend/app/:/app"
     ports:

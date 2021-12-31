@@ -1,24 +1,9 @@
-from flask import Flask
-from flask_restx import Resource, Api
-from flask_cors import CORS
-import os
+from modules.flask_setup.flask import app
+from modules.api.setup import api
 
-app = Flask(__name__)
-CORS(app)
-api = Api(app)
+# initialize restx api
+api.init_app(app)
 
-# load config
-if os.getenv("ENV") == "development":
-    app.config.from_object("config.DevelopmentConfig")
-else:
-    app.config.from_object("config.ProductionConfig")
-
-
-@api.route("/api/hello")
-class HelloWorld(Resource):
-    def get(self):
-        return {"hello": "world"}
-
-
+# initialize model
 if __name__ == "__main__":
     app.run(app.config["HOST"], port=app.config["PORT"])
