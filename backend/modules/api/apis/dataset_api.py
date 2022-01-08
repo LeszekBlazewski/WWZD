@@ -1,57 +1,48 @@
-from ...data.data_loader import data_loader
-from ...model.dimension_reduction_loader import reduction_models_loader
+from ...data.dataset_loader import dataset_loader
+from ...data.dimension_reduction_loader import reduction_models_loader
 from ...data.exceptions import WrongAlgorithmException, WrongDatasetException
-from flask_restx import Resource, abort, reqparse
+from flask_restx import Resource, reqparse
 from ..models.data_models import (
     data_point_model,
     dataset_model,
     dataset_api,
     dataset_load_input,
-    dataset_load_response,
+    dataset_load_model,
 )
 
 
 @dataset_api.errorhandler(WrongAlgorithmException)
 @dataset_api.errorhandler(WrongDatasetException)
 def handle_wrong_param_exception(error):
-    return {"message": error.message}, 400
+    return {"message": str(error)}, 400
 
 
 def validate_input(dataset_name: str, algorithm: str):
-    if dataset_name not in data_loader.get_dataset_names():
-        abort(
-            400,
-            f"Wrong datasetName, must be one of: {data_loader.get_dataset_names()}",
+    if dataset_name not in dataset_loader.get_dataset_names():
+        raise WrongDatasetException(
+            f"Wrong datasetName, must be one of: {dataset_loader.get_dataset_names()}"
         )
-    if (
-        algorithm
-        and algorithm
-        not in reduction_models_loader.get_reduction_models_for_dataset(dataset_name)
+    if algorithm not in reduction_models_loader.get_reduction_models_for_dataset(
+        dataset_name
     ):
-        abort(
-            400,
-            f"Wrong algorithm name, must be one of: {reduction_models_loader.get_reduction_models_for_dataset(dataset_name)}",
+        raise WrongAlgorithmException(
+            f"Wrong algorithm name, must be one of: {reduction_models_loader.get_reduction_models_for_dataset(dataset_name)}"
         )
 
 
 @dataset_api.route("/")
 class DatasetResourceList(Resource):
-    @dataset_api.doc(
-        description="List available datasets\n\n samplesCount will be null if dataset is not loaded in running application"
-    )
-    @dataset_api.response(200, "Available datasets to query", dataset_model)
+    @dataset_api.doc(description="List available datasets")
+    @dataset_api.response(200, "Available datasets to query", [dataset_model])
     @dataset_api.marshal_list_with(dataset_model)
     def get(self):
         reduced_datasets = []
-        datasets = data_loader.get_datasets()
-        reduction_models = reduction_models_loader.get_models()
+        datasets = dataset_loader.get_objects()
+        reduction_models = reduction_models_loader.get_objects()
         for key in datasets.keys() & reduction_models.keys():
-            # we simply take number of samples from first dataset of model (all have same number of samples)
-            samples_count = list(datasets[key].values())[0].samples_count
             reduced_datasets.append(
                 {
                     "name": key,
-                    "samplesCount": samples_count,
                     "availableReductionModels": [
                         m for m in reduction_models[key].keys()
                     ],
@@ -84,7 +75,7 @@ parser.add_argument(
     "/<string:dataset_name>",
     doc={
         "params": {
-            "dataset_name": f"One of the following: {data_loader.get_dataset_names()}"
+            "dataset_name": f"One of the following: {dataset_loader.get_dataset_names()}"
         }
     },
 )
@@ -98,38 +89,27 @@ class DatasetResource(Resource):
         start = request_args["start"]
         stop = request_args["stop"]
         validate_input(dataset_name, algorithm)
-        dataset_data = data_loader.get_classification_dataset(
-            dataset_name, algorithm
-        ).get()
+        dataset_data = dataset_loader.get_object(dataset_name, algorithm).get()
         return dataset_data[start:stop]
 
 
 @dataset_api.route("/load")
 class DatasetLoadResource(Resource):
     @dataset_api.doc(
-        description=f"Load sample set or sets for given dataset\n\ndatasetName one from:{data_loader.get_dataset_names()}\n\navailableReductionModel: Name of the algorithm from /datasets endpoint which was used to reduce data dimension. If no algorithm specified, samples for all available algorithms will be loaded"
+        description=f"Load dataset and reduction model for given pair\n\ndatasetName one from:{dataset_loader.get_dataset_names()}\n\navailableReductionModel: Name of the algorithm from /datasets endpoint which was used to reduce data dimension."
     )
     @dataset_api.response(
-        200, "Dataset/s loaded and details returned", dataset_load_response
+        200, "Dataset and model loaded and details returned", dataset_load_model
     )
     @dataset_api.expect(dataset_load_input)
-    @dataset_api.marshal_with(dataset_load_response)
+    @dataset_api.marshal_with(dataset_load_model)
     def post(self):
         dataset_name = dataset_api.payload["datasetName"]
-        if "availableReductionModel" in dataset_api.payload:
-            algorithm = dataset_api.payload["availableReductionModel"]
-        else:
-            algorithm = None
+        algorithm = dataset_api.payload["availableReductionModel"]
         validate_input(dataset_name, algorithm)
-        loaded_entry = data_loader.load_classification_dataset(dataset_name, algorithm)
-        reduction_models = reduction_models_loader.get_reduction_models_for_dataset(
-            dataset_name
-        )
+        data_entry = dataset_loader.get_object(dataset_name, algorithm)
+        reduction_models_loader.load_object(dataset_name, algorithm)
         return {
-            "datasetDetails": {
-                "name": dataset_name,
-                "samplesCount": loaded_entry.samples_count,
-                "availableReductionModels": reduction_models,
-            },
-            "status": "partial" if algorithm else "all",
+            "name": dataset_name,
+            "samplesCount": data_entry.samples_count,
         }

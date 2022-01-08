@@ -1,5 +1,5 @@
 from flask_restx import Namespace, fields
-from ...data.data_loader import data_loader
+from ...data.dataset_loader import dataset_loader
 
 dataset_api = Namespace(
     "datasets", description="All operations regarding available datasets"
@@ -54,14 +54,20 @@ data_point_model = dataset_api.model(
     },
 )
 
+dataset_load_model = dataset_api.model(
+    "DatasetLoad",
+    {
+        "name": fields.String(required=True, description="Name of the dataset"),
+        "samplesCount": fields.Integer(
+            description="Total number of samples in the dataset",
+        ),
+    },
+)
+
 dataset_model = dataset_api.model(
     "Dataset",
     {
         "name": fields.String(required=True, description="Name of the dataset"),
-        "samplesCount": fields.Integer(
-            allow_null=True,
-            description="Total number of samples in the dataset, If dataset isn't loaded will be null",
-        ),
         "availableReductionModels": fields.List(
             fields.String,
             description="List of available reduction models for given dataset",
@@ -74,20 +80,11 @@ dataset_load_input = dataset_api.model(
     {
         "datasetName": fields.String(
             required=True,
-            description=f"Name of dataset to load from: {data_loader.get_dataset_names()}",
+            description=f"Name of dataset to load from: {dataset_loader.get_dataset_names()}",
         ),
         "availableReductionModel": fields.String(
-            description="Name of the algorithm from /datasets endpoint which was used to reduce data dimension. If empty all of the reduction models will be loaded",
-        ),
-    },
-)
-
-dataset_load_response = dataset_api.model(
-    "DatasetLoadResponse",
-    {
-        "datasetDetails": fields.Nested(dataset_model),
-        "status": fields.String(
-            description="'partial' if only given reduction model loaded 'all' if all models loaded"
+            required=True,
+            description="Name of the algorithm from /datasets endpoint which was used to reduce data dimension.",
         ),
     },
 )

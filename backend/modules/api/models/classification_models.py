@@ -1,5 +1,5 @@
 from flask_restx import Namespace, fields
-from ...data.data_loader import data_loader
+from ...data.dataset_loader import dataset_loader
 
 classification_api = Namespace(
     "classification", description="Operations regarding classification of new samples"
@@ -10,7 +10,7 @@ classification_input = classification_api.model(
     {
         "datasetName": fields.String(
             required=True,
-            description=f"Name of dataset from: {data_loader.get_dataset_names()} for which reduction model will be loaded",
+            description=f"Name of dataset from: {dataset_loader.get_dataset_names()} for which reduction model will be loaded",
         ),
         "availableReductionModel": fields.String(
             required=True,

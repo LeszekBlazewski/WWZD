@@ -1,17 +1,17 @@
 from flask_restx import Resource, abort
 from .dataset_api import data_point_model
 from ...model.model import model
-from ...model.dimension_reduction_loader import reduction_models_loader
+from ...data.dimension_reduction_loader import reduction_models_loader
 from ...flask_setup.flask import app
 from ..models.classification_models import classification_api, classification_input
 from .dataset_api import validate_input
-from ...data.data_loader import data_loader
+from ...data.dataset_loader import dataset_loader
 
 
 @classification_api.route("/")
 class ClassificationResource(Resource):
     @classification_api.doc(
-        description=f"Classify given samples\n\ndatasetName one from:{data_loader.get_dataset_names()}\n\navailableReductionModel: Name of the algorithm from /datasets endpoint which was used to reduce data dimension.\n\textSamples:list of phrases to classify"
+        description=f"Classify given samples\n\ndatasetName one from:{dataset_loader.get_dataset_names()}\n\navailableReductionModel: Name of the algorithm from /datasets endpoint which was used to reduce data dimension.\n\textSamples:list of phrases to classify"
     )
     @classification_api.expect(classification_input)
     @classification_api.marshal_list_with(data_point_model)
@@ -28,7 +28,9 @@ class ClassificationResource(Resource):
         validate_input(dataset_name, algorithm)
         try:
             (last_layer_outputs, predictions) = model.predict(text_samples)
-            reduction_model = reduction_models_loader.get_model(dataset_name, algorithm)
+            reduction_model = reduction_models_loader.get_object(
+                dataset_name, algorithm
+            )
             response_classification_fields = [
                 "toxic",
                 "severeToxic",
