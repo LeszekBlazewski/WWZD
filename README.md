@@ -2,6 +2,10 @@
 
 Big data visualisations
 
+## Docker INFO
+
+All of the loaded models/datasets are really memory hungry, so be sure to give your docker resources around 14GB.
+
 ## How to start the project
 
 ### DEV MODE
@@ -15,39 +19,20 @@ Access the backend (swagger) on http://localhost:8081
 
 For easier backend development, when rebuilding docker image often, it would be wise to use pip cache since the modules weight much. Do the following:
 
-`docker-compose.yml`
-
-```yaml
-Add volume to backend service
-
-- "$HOME/.cache/pip-docker/:/root/.cache/pip"
-```
-
-`entrypoint.sh`
-
-```bash
-Create the following file in backend directory
-
-#!/bin/bash
-
-pip install --upgrade pip
-pip install -r requirements.txt
-exec "$@"
-```
-
-`Dockerfile`
+Change the line with pip install in `Dockerfile` to:
 
 ```Dockerfile
-Modify the dockerfile to following
+RUN --mount=type=cache,target=/root/.cache/pip pip install -r requirements.txt
+```
 
-ADD COPY entrypoint.sh .
+```bash
+docker-compose up
+```
 
-Remove RUN pip install --no-cache-dir --upgrade pip && pip install --no-cache-dir -r requirements.txt
+If the command files it might be necessary to:
 
-ADD RUN pip install gdown==4.2.0
-
-ADD ENTRYPOINT ["./entrypoint.sh"]
-
+1. Add the line `# syntax = docker/dockerfile:experimental` as first line in Dockerfile
+2. Run `export DOCKER_BUILDKIT=1` before issuing `docker-compose up` 
 ### PROD MODE
 
 ```bash

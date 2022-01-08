@@ -13,6 +13,8 @@ class Dataset(object):
             self.load()
 
     def load(self):
+        if self.loaded:
+            return self
         with open(self.dataset_path, "rb") as datapoints_file:
             self._datapoints: list[Dict] = pickle.load(datapoints_file)
             self.loaded = True

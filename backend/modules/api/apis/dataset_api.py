@@ -36,7 +36,9 @@ def validate_input(dataset_name: str, algorithm: str):
 
 @dataset_api.route("/")
 class DatasetResourceList(Resource):
-    @dataset_api.doc(description="List available datasets")
+    @dataset_api.doc(
+        description="List available datasets\n\n samplesCount will be null if dataset is not loaded in running application"
+    )
     @dataset_api.response(200, "Available datasets to query", dataset_model)
     @dataset_api.marshal_list_with(dataset_model)
     def get(self):
