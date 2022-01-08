@@ -6,10 +6,10 @@ services:
       context: ./backend
       target: prod
     restart: unless-stopped
-    command: "python app.py"
-    stop_signal: SIGINT
+    command: "gunicorn -b 0.0.0.0:8081 --timeout 1000 app:app"
     environment:
       - ENV=production
+      - API_URL=/api
     expose:
       - 8081
 
@@ -18,5 +18,8 @@ services:
       context: ./frontend
       target: prod
     restart: unless-stopped
+    environment:
+      - ENV=production
+      - API_URL=/api
     ports:
       - "8080:8080"

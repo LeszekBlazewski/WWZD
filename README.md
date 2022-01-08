@@ -28,7 +28,7 @@ docker-compose up
 ```
 
 Access the frontend on http://localhost:8080
-Access the backend (swagger) on http://localhost:8081
+Access the backend (swagger) on http://localhost:8081/api/
 
 For easier backend development, when rebuilding docker image often, it would be wise to use pip cache since the modules weight much. Do the following:
 

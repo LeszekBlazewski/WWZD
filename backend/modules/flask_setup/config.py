@@ -4,7 +4,7 @@ import os
 class Config(object):
     HOST = "0.0.0.0"
     PORT = "8081"
-    ENV = os.getenv("ENV")
+    ENV = os.getenv("ENV")  # From Docker Compose
     LABEL_LIST = [
         "toxic",
         "severe_toxic",
@@ -22,14 +22,17 @@ class Config(object):
     # Based on the tar archive strśucture from google drive
     BERT_MODEL_PATH = f"{ASSETS_PATH}/bert"
     SWAGGER_UI_DOC_EXPANSION = "list"
+    API_URL = os.getenv("API_URL")  # From Docker Compose
 
 
 class DevelopmentConfig(Config):
+    ENABLE_SWAGGER = True
     DEBUG = True
     DEVELOPMENT = True
     TESTING = True
 
 
 class ProductionConfig(Config):
+    ENABLE_SWAGGER = False
     DEVELOPMENT = False
     DEBUG = False

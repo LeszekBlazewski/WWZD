@@ -13,6 +13,6 @@ ENTRYPOINT [ "/app/entrypoint.sh" ]
 FROM nginx:stable-alpine as prod
 RUN mkdir /app
 COPY --from=build /app/dist /app
-COPY nginx.conf /etc/nginx/nginx.conf
+COPY default.conf.template /etc/nginx/templates/default.conf.template
 
 EXPOSE 8080

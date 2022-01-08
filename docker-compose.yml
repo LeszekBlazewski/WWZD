@@ -6,12 +6,13 @@ services:
       context: ./backend
       target: base
     restart: unless-stopped
-    command: "python app.py"
     stop_signal: SIGINT
+    command: "python app.py"
     volumes:
       - "./backend:/app"
     environment:
       - ENV=development
+      - API_URL=/api
     ports:
       - 8081:8081
     expose:
@@ -24,6 +25,9 @@ services:
     restart: unless-stopped
     volumes:
       - "./frontend/app/:/app"
+    environment:
+      - ENV=development
+      - API_URL=/api
     ports:
       - "8080:8080"
     command: "npm run dev"

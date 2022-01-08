@@ -1,8 +1,8 @@
 from modules.flask_setup.flask import app
-from modules.api.setup import api
+from modules.api.setup import blueprint
 
 # initialize restx api
-api.init_app(app)
+app.register_blueprint(blueprint)
 
 # initialize model
 if __name__ == "__main__":
