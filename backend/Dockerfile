@@ -3,7 +3,7 @@ FROM python:3.7-slim-buster as base
 WORKDIR /app
 
 COPY requirements.txt .
-RUN --mount=type=cache,target=/root/.cache/pip pip install -r requirements.txt
+RUN pip install --no-cache-dir --upgrade pip && pip install --no-cache-dir -r requirements.txt
 
 ARG MODEL_ADDRESS=https://drive.google.com/uc?id=19CtF7rICsT0bbpisbn1t5CIxHG1USxh4
 ARG DATASETS_ADDRESS=https://drive.google.com/uc?id=1-SFFXLXYvE13JsigqnP-QVFTDOczvb30
