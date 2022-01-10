@@ -1,6 +1,6 @@
 import { ref, reactive, watch } from 'vue'
 import { SubclassLabels } from '@/models'
-import type { Classification, Subclass } from '@/models'
+import type { Subclass } from '@/models'
 
 export function useClassSelection(limit = 1) {
   const selection = ref<string[]>([])
@@ -20,7 +20,7 @@ export function useClassSelection(limit = 1) {
     selection.value = []
   }
 
-  const classFilter = reactive<Classification>({
+  const classFilter = reactive({
     toxic: false,
     severeToxic: false,
     obscene: false,
