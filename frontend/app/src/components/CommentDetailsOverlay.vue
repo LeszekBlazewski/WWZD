@@ -1,10 +1,5 @@
 <template>
-  <n-alert
-    :class="alertClass"
-    :style="{ backgroundColor: 'rgba(24, 24, 28, 0.95)' }"
-    type="default"
-    :show-icon="false"
-  >
+  <n-alert :class="alertClass" type="default" :show-icon="false">
     <b>{{ warning }}</b>
     {{ limitedContent }}
   </n-alert>
@@ -22,11 +17,7 @@
     content: '',
   })
 
-  const warning = computed(() => {
-    return props.content.length <= 300
-      ? ''
-      : '(click on the node to view full content)\n'
-  })
+  const warning = '(click on the node to view full content)\n'
 
   const limitedContent = computed(() => {
     if (props.content.length <= 300) {
@@ -45,6 +36,7 @@
 
 <style lang="scss" scoped>
   .n-alert {
+    background-color: rgba(24, 24, 28, 0.95);
     position: fixed;
     bottom: 45px;
     left: 15px;

@@ -8,11 +8,13 @@ export function usePlotlyConfiguration() {
       color: '#ffffff',
     },
     xaxis: {
+      autorange: true,
       gridwidth: 2,
       zerolinewidth: 2,
       gridcolor: '#171717',
     },
     yaxis: {
+      autorange: true,
       gridwidth: 2,
       zerolinewidth: 2,
       gridcolor: '#171717',
@@ -40,7 +42,7 @@ export function usePlotlyConfiguration() {
           ...plotDataDefaults(),
           name: 'good comment',
           marker: {
-            color: '#00ff00',
+            color: '#116300',
           },
         }
 
@@ -49,7 +51,7 @@ export function usePlotlyConfiguration() {
           ...plotDataDefaults(),
           name: 'toxic',
           marker: {
-            color: '#ff0000',
+            color: '#8c0000',
           },
         }
 
@@ -58,7 +60,7 @@ export function usePlotlyConfiguration() {
           ...plotDataDefaults(),
           name: 'added by user',
           marker: {
-            color: '#ea00ff',
+            color: '#ffdd00',
             line: {
               color: '#000000',
               width: 1,

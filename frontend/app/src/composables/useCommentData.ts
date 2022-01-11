@@ -1,4 +1,4 @@
-import { ref } from 'vue'
+import { ref, watch } from 'vue'
 import { ClassLabels } from '@/models'
 import type {
   Classification,
@@ -45,6 +45,7 @@ export function useCommentData() {
 
   const subscribeToPlotEvents = (chart: Plotly.PlotlyHTMLElement) => {
     chart.on('plotly_hover', (data) => {
+      if (!data?.points || data.points.length < 1) return
       const point = data.points[0]
       const pointData = JSON.parse(point.customdata as string) as CommentDetails
 
@@ -54,6 +55,7 @@ export function useCommentData() {
     })
 
     chart.on('plotly_click', (data) => {
+      if (!data?.points || data.points.length < 1) return
       const point = data.points[0]
       const pointData = JSON.parse(point.customdata as string) as CommentDetails
 
@@ -64,11 +66,23 @@ export function useCommentData() {
     })
 
     chart.on('plotly_unhover', () => {
-      tags.value = ''
-      comment.value = ''
-      classification.value = null
+      if (!showModal.value) {
+        tags.value = ''
+        comment.value = ''
+        classification.value = null
+      }
     })
   }
+
+  watch(showModal, (newVal, oldVal) => {
+    if (oldVal && !newVal) {
+      setTimeout(() => {
+        tags.value = ''
+        comment.value = ''
+        classification.value = null
+      }, 350)
+    }
+  })
 
   return {
     comment,

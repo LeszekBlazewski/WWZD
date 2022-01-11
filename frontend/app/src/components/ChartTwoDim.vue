@@ -1,5 +1,6 @@
 <template>
   <div ref="chart" class="chart" />
+  <DatasetInfoOverlay />
   <CommentDetailsOverlay :title="tags" :content="comment" />
   <CommentDetailsModal
     v-model:show="showModal"
@@ -14,6 +15,7 @@
   import Plotly from 'plotly.js-basic-dist'
   import CommentDetailsOverlay from '@/components/CommentDetailsOverlay.vue'
   import CommentDetailsModal from '@/components/CommentDetailsModal.vue'
+  import DatasetInfoOverlay from '@/components/DatasetInfoOverlay.vue'
   import { useCommentsStore } from '@/stores/commentsStore'
   import { useCommentData } from '@/composables/useCommentData'
   import { usePlotlyConfiguration } from '@/composables/usePlotlyConfiguration'
@@ -65,10 +67,19 @@
     return result
   })
 
-  watchEffect(() => {
+  watchEffect(async () => {
     if (chart.value) {
-      Plotly.newPlot(chart.value, plotData.value, plotLayout, plotConfig)
-      subscribeToPlotEvents(chart.value)
+      const plot = await Plotly.newPlot(
+        chart.value,
+        plotData.value,
+        plotLayout,
+        plotConfig
+      )
+      subscribeToPlotEvents(plot)
+      Plotly.relayout(plot, {
+        'xaxis.autorange': true,
+        'yaxis.autorange': true,
+      })
     }
   })
 </script>

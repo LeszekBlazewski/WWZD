@@ -17,7 +17,20 @@
       </n-layout>
 
       <n-layout-footer>
-        <span>Made with ❤️</span>
+        <span>
+          Made with ❤️ by
+          <a class="link" href="https://github.com/dex1g/" target="_blank"
+            >Karol Noga</a
+          >
+          and
+          <a
+            class="link"
+            href="https://github.com/LeszekBlazewski"
+            target="_blank"
+          >
+            Leszek Błażewski
+          </a>
+        </span>
       </n-layout-footer>
     </n-layout>
   </n-config-provider>
@@ -43,6 +56,9 @@
     Button: {
       fontSizeLarge: '1.3rem',
     },
+    Slider: {
+      handleSize: '10px',
+    },
   }
 </script>
 
@@ -51,8 +67,12 @@
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
     text-align: center;
-  }
 
+    --n-handle-size: 12px;
+  }
+</style>
+
+<style lang="scss" scoped>
   .main-layout {
     height: calc(100vh - 90px);
   }
@@ -68,8 +88,6 @@
     .n-image {
       aspect-ratio: 1;
       margin-right: 8px;
-      // padding: 10px;
-      // height: 40px;
       pointer-events: none;
     }
 
@@ -80,7 +98,6 @@
   }
 
   .n-layout-footer {
-    // background: rgba(128, 128, 128, 0.2);
     height: 30px;
     display: flex;
     align-items: center;
@@ -95,5 +112,13 @@
     width: var(--sider-width) !important;
     background: rgba(27, 27, 27, 0.3);
     border-left: 1px solid rgb(49, 49, 49);
+  }
+
+  .n-slider.n-slider--disabled .n-slider-handles .n-slider-handle {
+    cursor: not-allowed;
+  }
+
+  .link {
+    color: var(--n-text-color);
   }
 </style>

@@ -1,6 +1,6 @@
 import { defineStore } from 'pinia'
 import axios from 'axios'
-import type { Comment, Subclass, ReductionModel } from '@/models'
+import type { Comment, Subclass, ReductionModel, DatasetInfo } from '@/models'
 
 const apiUrl = import.meta.env.VITE_APP_API_URL
 
@@ -9,6 +9,8 @@ export type CommentState = {
   userComments: Comment[]
   filter: 'all' | Subclass
   loading: boolean
+  dataset: null | DatasetInfo
+  sampleRange: [number, number]
 }
 
 export const useCommentsStore = defineStore('comments', {
@@ -18,6 +20,8 @@ export const useCommentsStore = defineStore('comments', {
       userComments: [],
       filter: 'all',
       loading: false,
+      dataset: null,
+      sampleRange: [0, 0],
     } as CommentState
   },
   getters: {
@@ -49,6 +53,10 @@ export const useCommentsStore = defineStore('comments', {
     ) {
       if (!dataset || !method) return
       this.loading = true
+
+      const datasetChanged =
+        this.dataset?.name !== dataset || this.dataset.reductionModel !== method
+
       try {
         const response = await axios.get(`/datasets/${dataset}`, {
           baseURL: apiUrl,
@@ -61,6 +69,15 @@ export const useCommentsStore = defineStore('comments', {
 
         if (response.status === 200 && isCommentArray(response.data)) {
           this.comments = response.data
+          this.sampleRange = [start, stop]
+          if (datasetChanged) {
+            this.dataset = {
+              name: dataset,
+              reductionModel: method,
+              samplesCount: stop - start,
+            }
+            this.clearUserComments()
+          }
         } else {
           throw new Error('Invalid response')
         }

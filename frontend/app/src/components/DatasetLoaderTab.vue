@@ -21,19 +21,54 @@
 
   <p>Number of samples</p>
   <n-slider
-    v-model:value="numberOfSamples"
+    v-model:value="sliderVals"
     :step="100"
     :min="0"
     :max="datasetsStore.selectedDataset?.samplesCount ?? 20000"
-    :disabled="!datasetsStore.selectedDataset"
+    :disabled="samplePickerDisabled"
     range
   />
+
+  <n-grid style="margin-bottom: 30px" :x-gap="12" :y-gap="8" :cols="3">
+    <n-grid-item>
+      <p class="label">Start</p>
+    </n-grid-item>
+    <n-grid-item :span="2">
+      <n-input-number
+        v-model:value="sampleFrom"
+        :min="0"
+        :max="sampleTo - 1"
+        :disabled="samplePickerDisabled"
+      />
+    </n-grid-item>
+    <n-grid-item>
+      <p class="label">End</p>
+    </n-grid-item>
+    <n-grid-item :span="2">
+      <n-input-number
+        v-model:value="sampleTo"
+        :min="sampleFrom + 1"
+        :max="datasetsStore.selectedDataset?.samplesCount ?? 20000"
+        :disabled="samplePickerDisabled"
+      />
+    </n-grid-item>
+    <n-grid-item>
+      <p class="label">Samples</p>
+    </n-grid-item>
+    <n-grid-item :span="2">
+      <n-input-number
+        v-model:value="numberOfSamples"
+        :show-button="false"
+        disabled
+      />
+    </n-grid-item>
+  </n-grid>
 
   <n-spin size="small" :show="commentsStore.loading">
     <n-button
       size="large"
       @click="loadSamples"
-      :disabled="!datasetsStore.selectedDataset"
+      :disabled="samplePickerDisabled"
     >
       Load samples
     </n-button>
@@ -52,7 +87,17 @@
 
 <script lang="ts" setup>
   import { onMounted, ref, watch, computed } from 'vue'
-  import { NSelect, NButton, NDivider, NSlider, NModal, NSpin } from 'naive-ui'
+  import {
+    NSelect,
+    NButton,
+    NDivider,
+    NSlider,
+    NModal,
+    NSpin,
+    NInputNumber,
+    NGrid,
+    NGridItem,
+  } from 'naive-ui'
   import { useCommentsStore } from '@/stores/commentsStore'
   import { useDatasetsStore } from '@/stores/datasetsStore'
   import type { SelectMixedOption } from 'naive-ui/lib/select/src/interface'
@@ -63,14 +108,44 @@
 
   const selDataset = ref('')
   const selModel = ref('')
-  const numberOfSamples = ref<[number, number]>([0, 2000])
+  const sliderVals = ref<[number, number]>([0, 5000])
   const modelOpts = ref<SelectMixedOption[]>([])
   const showModal = ref(false)
 
+  const sampleFrom = ref(0)
+  const sampleTo = ref(5000)
+
+  const samplePickerDisabled = computed(() => {
+    return !datasetsStore.selectedDataset
+  })
+
   const sampleRange = computed(() => {
-    return [...numberOfSamples.value].sort((a, b) => {
+    return [...sliderVals.value].sort((a, b) => {
       return a - b
     })
+  })
+
+  watch([sampleFrom, sampleTo], ([newFrom, newTo]) => {
+    if (
+      !sliderVals.value.includes(newFrom) ||
+      !sliderVals.value.includes(newTo)
+    ) {
+      sliderVals.value = [newFrom, newTo]
+    }
+  })
+
+  watch(sampleRange, ([newFrom, newTo]) => {
+    if (sampleFrom.value !== newFrom) {
+      sampleFrom.value = newFrom
+    }
+    if (sampleTo.value !== newTo) {
+      sampleTo.value = newTo
+    }
+  })
+
+  const numberOfSamples = computed(() => {
+    const [from, to] = sampleRange.value
+    return to - from
   })
 
   watch(selDataset, (datasetName) => {
@@ -132,5 +207,15 @@
 
   .n-slider {
     margin-bottom: 30px;
+  }
+
+  .n-input-number {
+    display: inline;
+    max-width: 50%;
+  }
+
+  .label {
+    margin: 3px 0 0 0;
+    text-align: left;
   }
 </style>
