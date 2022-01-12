@@ -46,6 +46,7 @@ classification_field = dataset_api.model(
 data_point_model = dataset_api.model(
     "DataPoint",
     {
+        "id": fields.String(description="Id of the data point"),
         "text": fields.String(
             required=True, description="The actual text that was classified"
         ),
