@@ -12,5 +12,4 @@ class DataObject(abc.ABC):
     @abc.abstractmethod
     def load(self):
         if self.loaded:
-            print("already loaded")
             return

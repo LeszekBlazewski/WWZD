@@ -1,6 +1,9 @@
 server {
   listen       8080;
   server_name  "";
+  proxy_read_timeout 300;
+  proxy_connect_timeout 300;
+  proxy_send_timeout 300; 
 
   #pass ${API_URL} requests to Flask backend
   location ${API_URL} {
@@ -18,5 +21,5 @@ server {
   error_page   500 502 503 504  /50x.html;
   location = /50x.html {
     root   /usr/share/nginx/html;
-    }
+  }
 }

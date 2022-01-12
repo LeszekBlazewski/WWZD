@@ -61,10 +61,6 @@ export function usePlotlyConfiguration() {
           name: 'added by user',
           marker: {
             color: '#ffdd00',
-            line: {
-              color: '#000000',
-              width: 1,
-            },
           },
         }
 
@@ -73,11 +69,7 @@ export function usePlotlyConfiguration() {
           ...plotDataDefaults(),
           name: type.filter,
           marker: {
-            color: '#ff0000',
-            line: {
-              color: '#0000ff',
-              width: 2,
-            },
+            color: '#0091ff',
           },
         }
     }
