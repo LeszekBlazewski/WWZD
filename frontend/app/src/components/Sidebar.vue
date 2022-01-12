@@ -3,7 +3,9 @@
     <n-tabs type="segment">
       <n-tab-pane name="load" tab="Load" display-directive="show">
         <n-card title="Load dataset" size="huge">
-          <DatasetLoaderTab />
+          <n-dialog-provider>
+            <DatasetLoaderTab />
+          </n-dialog-provider>
         </n-card>
       </n-tab-pane>
 
@@ -23,7 +25,7 @@
 </template>
 
 <script lang="ts" setup>
-  import { NCard, NTabs, NTabPane } from 'naive-ui'
+  import { NCard, NTabs, NTabPane, NDialogProvider } from 'naive-ui'
   import ClassSelectorTab from '@/components/ClassSelectorTab.vue'
   import CommentInsertionTab from '@/components/CommentInsertionTab.vue'
   import DatasetLoaderTab from '@/components/DatasetLoaderTab.vue'

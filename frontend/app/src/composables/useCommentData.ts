@@ -30,7 +30,7 @@ export function useCommentData() {
 
   const mapToPlotData = (comments: Comment[]): Partial<Plotly.Data> => {
     return {
-      // ids: comments.map((c) => c.comment), // TODO nadawać idki do refresha - ma byc string !!!
+      ids: comments.map((c) => c.id),
       x: comments.map((c) => c.position.x),
       y: comments.map((c) => c.position.y),
       customdata: comments.map((c) =>

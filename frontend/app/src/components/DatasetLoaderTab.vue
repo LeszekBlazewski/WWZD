@@ -97,6 +97,7 @@
     NInputNumber,
     NGrid,
     NGridItem,
+    useDialog,
   } from 'naive-ui'
   import { useCommentsStore } from '@/stores/commentsStore'
   import { useDatasetsStore } from '@/stores/datasetsStore'
@@ -105,6 +106,7 @@
 
   const commentsStore = useCommentsStore()
   const datasetsStore = useDatasetsStore()
+  const dialog = useDialog()
 
   const selDataset = ref('')
   const selModel = ref('')
@@ -186,12 +188,41 @@
 
   const loadSamplesCallback = () => {
     if (!datasetsStore.selectedDataset) return
-    commentsStore.loadComments(
-      datasetsStore.selectedDataset.name,
-      datasetsStore.selectedDataset.reductionModel,
-      sampleRange.value[0],
-      sampleRange.value[1]
-    )
+
+    if (commentsStore.userComments.length > 0) {
+      dialog.info({
+        title: 'Dataset change',
+        content:
+          'You are about to load a different dataset. Do you want to recalculate user added samples or remove them?',
+        positiveText: 'Recalculate',
+        negativeText: 'Remove',
+        maskClosable: false,
+        onPositiveClick: () => {
+          commentsStore.loadComments(
+            datasetsStore.selectedDataset.name,
+            datasetsStore.selectedDataset.reductionModel,
+            sampleRange.value[0],
+            sampleRange.value[1],
+            false
+          )
+        },
+        onNegativeClick: () => {
+          commentsStore.loadComments(
+            datasetsStore.selectedDataset.name,
+            datasetsStore.selectedDataset.reductionModel,
+            sampleRange.value[0],
+            sampleRange.value[1]
+          )
+        },
+      })
+    } else {
+      commentsStore.loadComments(
+        datasetsStore.selectedDataset.name,
+        datasetsStore.selectedDataset.reductionModel,
+        sampleRange.value[0],
+        sampleRange.value[1]
+      )
+    }
   }
 </script>
 

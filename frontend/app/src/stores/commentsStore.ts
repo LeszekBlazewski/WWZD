@@ -49,7 +49,8 @@ export const useCommentsStore = defineStore('comments', {
       dataset: string,
       method: ReductionModel,
       start: number,
-      stop: number
+      stop: number,
+      clearUserComments: boolean = true
     ) {
       if (!dataset || !method) return
       this.loading = true
@@ -68,16 +69,26 @@ export const useCommentsStore = defineStore('comments', {
         })
 
         if (response.status === 200 && isCommentArray(response.data)) {
-          this.comments = response.data
-          this.sampleRange = [start, stop]
+          this.comments = []
           if (datasetChanged) {
             this.dataset = {
               name: dataset,
               reductionModel: method,
               samplesCount: stop - start,
             }
-            this.clearUserComments()
+            if (clearUserComments) {
+              this.clearUserComments()
+            } else {
+              const userAdded = this.userComments.map((c) => {
+                return c.text
+              })
+              this.clearUserComments()
+              await this.addComments(dataset, method, userAdded)
+              this.loading = true
+            }
           }
+          this.sampleRange = [start, stop]
+          this.comments = response.data
         } else {
           throw new Error('Invalid response')
         }
@@ -102,10 +113,10 @@ export const useCommentsStore = defineStore('comments', {
     //   this.loading = false
     // },
 
-    async addComment(
+    async addComments(
       dataset: string,
       reductionMethod: ReductionModel,
-      comment: string
+      comments: string[]
     ) {
       this.loading = true
 
@@ -115,7 +126,7 @@ export const useCommentsStore = defineStore('comments', {
           {
             datasetName: dataset,
             availableReductionModel: reductionMethod,
-            textSamples: [comment],
+            textSamples: comments,
           },
           {
             baseURL: apiUrl,
@@ -123,7 +134,13 @@ export const useCommentsStore = defineStore('comments', {
         )
 
         if (response.status === 200 && isCommentArray(response.data)) {
-          this.userComments.push(...response.data)
+          const results = response.data.map((c) => {
+            return {
+              ...c,
+              id: tinySimpleHash(c.text),
+            }
+          })
+          this.userComments.push(...results)
         } else {
           throw new Error('Invalid response')
         }
@@ -152,8 +169,15 @@ function isCommentArray(value: unknown): value is Comment[] {
 function instanceOfComment(value: object): value is Comment {
   return (
     !!value &&
+    'id' in value &&
     'text' in value &&
     'position' in value &&
     'classification' in value
   )
+}
+
+function tinySimpleHash(s: string) {
+  for (var i = 0, h = 9; i < s.length; )
+    h = Math.imul(h ^ s.charCodeAt(i++), 9 ** 9)
+  return ((h ^ (h >>> 9)) >>> 0).toString(16).padStart(8, '0')
 }

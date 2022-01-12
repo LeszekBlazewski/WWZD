@@ -21,6 +21,7 @@
   import { usePlotlyConfiguration } from '@/composables/usePlotlyConfiguration'
 
   const chart = ref<Plotly.PlotlyHTMLElement>()
+  const chartCreated = ref(false)
   const commentsStore = useCommentsStore()
 
   const {
@@ -69,17 +70,22 @@
 
   watchEffect(async () => {
     if (chart.value) {
-      const plot = await Plotly.newPlot(
+      const plot = await Plotly.react(
         chart.value,
         plotData.value,
         plotLayout,
         plotConfig
       )
-      subscribeToPlotEvents(plot)
+
       Plotly.relayout(plot, {
         'xaxis.autorange': true,
         'yaxis.autorange': true,
       })
+
+      if (!chartCreated.value) {
+        subscribeToPlotEvents(plot)
+        chartCreated.value = true
+      }
     }
   })
 </script>

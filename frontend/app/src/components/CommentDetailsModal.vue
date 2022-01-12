@@ -22,9 +22,9 @@
         </tr>
       </thead>
       <tbody>
-        <tr v-for="(value, name) in props.classification">
+        <tr v-for="[name, value] in sortedClasses">
           <td>{{ name }}</td>
-          <td>{{ value.prediction }}%</td>
+          <td>{{ value }}%</td>
         </tr>
       </tbody>
     </n-table>
@@ -32,8 +32,9 @@
 </template>
 
 <script lang="ts" setup>
+  import { computed } from 'vue'
   import { NModal, NTable, NDivider } from 'naive-ui'
-  import type { Classification } from '@/models'
+  import type { Classification, Prediction } from '@/models'
 
   interface Props {
     content: string
@@ -42,5 +43,16 @@
 
   const props = withDefaults(defineProps<Props>(), {
     content: '',
+    classification: null,
+  })
+
+  const sortedClasses = computed(() => {
+    return Object.entries(props.classification)
+      .map(([key, value]) => {
+        return [key, value.prediction]
+      })
+      .sort(([aKey, aVal], [bKey, bVal]) => {
+        return bVal - aVal
+      })
   })
 </script>

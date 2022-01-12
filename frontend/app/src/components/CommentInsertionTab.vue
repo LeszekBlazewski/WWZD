@@ -40,11 +40,9 @@
   const addComment = async () => {
     const dataset = datasetsStore.selectedDataset
     if (dataset) {
-      await commentsStore.addComment(
-        dataset.name,
-        dataset.reductionModel,
-        comment.value
-      )
+      await commentsStore.addComments(dataset.name, dataset.reductionModel, [
+        comment.value,
+      ])
       comment.value = ''
     }
   }
