@@ -15,7 +15,13 @@ The process of data extraction, pretrained model usage, training PCA/UMAP and vi
 
 ## Screenshots
 
+![API](./screenshots/api.jpg)
 
+![APP1](./screenshots/app.png)
+
+![APP2](./screenshots/app1.png)
+
+![APP3](./screenshots/app2.png)
 
 ## Used technologies
 
