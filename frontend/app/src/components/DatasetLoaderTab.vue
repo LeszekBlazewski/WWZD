@@ -198,6 +198,8 @@
         negativeText: 'Remove',
         maskClosable: false,
         onPositiveClick: () => {
+          if (!datasetsStore.selectedDataset) return
+
           commentsStore.loadComments(
             datasetsStore.selectedDataset.name,
             datasetsStore.selectedDataset.reductionModel,
@@ -207,6 +209,8 @@
           )
         },
         onNegativeClick: () => {
+          if (!datasetsStore.selectedDataset) return
+
           commentsStore.loadComments(
             datasetsStore.selectedDataset.name,
             datasetsStore.selectedDataset.reductionModel,

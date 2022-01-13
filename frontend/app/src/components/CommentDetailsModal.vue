@@ -47,11 +47,13 @@
   })
 
   const sortedClasses = computed(() => {
+    if (!props.classification) return []
+
     return Object.entries(props.classification)
       .map(([key, value]) => {
         return [key, value.prediction]
       })
-      .sort(([aKey, aVal], [bKey, bVal]) => {
+      .sort(([, aVal], [, bVal]) => {
         return bVal - aVal
       })
   })
