@@ -1,4 +1,4 @@
-# WWZD
+# Toxic text big data visualisations
 
 Big data visualizations - multiclassification of 6 types of toxicity: ['toxic', 'severe_toxic', 'obscene', 'threat', 'insult', 'identity_hate'].
 
@@ -13,11 +13,23 @@ where outputs of last hidden layer were extracted and fed as learning datasets i
 
 The process of data extraction, pretrained model usage, training PCA/UMAP and visualizing the results can be found in the [Jupyter notebook](./big_data.ipynb)
 
-Everything was visualized with Vue based frontend. Below you can find the details how to access the application.
+## Screenshots
+
+
+
+## Used technologies
+
+1. PyTorch - pretrained model + all ML related operations
+2. Flask-RESTX - backend api for allowing REST operations on the created models/datasets
+3. Plotly.js - visualising the datasets in browser
+4. Vue - for creating the SPA frontend part
+5. Docker - easy to run anywhere containers
+
+Below you can find the details how to access the application.
 
 ## Docker INFO
 
-All the loaded models/datasets are really memory hungry, so be sure to give your docker resources around 13 GB.
+All the loaded models/datasets are really memory hungry, so be sure to give your docker resources around 13 GB if you plan to load all of the datasets.
 
 ## How to start the project
 
@@ -42,15 +54,19 @@ RUN --mount=type=cache,target=/root/.cache/pip pip install -r requirements.txt
 docker-compose up
 ```
 
-If the command files, it might be necessary to:
+If the command fails, it might be necessary to:
 
 1. Add the line `# syntax = docker/dockerfile:experimental` as first line in Dockerfile
-2. Run `export DOCKER_BUILDKIT=1` before issuing `docker-compose up` 
+2. Run `export DOCKER_BUILDKIT=1` before issuing `docker-compose up`
+
+
 ### PROD MODE
 
 ```bash
 docker-compose -f docker-compose.prod.yml up
 ```
+
+Optimized for deployment, uses nginx as reverse proxy, gunicorn to run the api and does not require docker volumes.
 
 Access the frontend on http://localhost:8080
 Access the backend from Vue on http://localhost:8080/api (swagger not exposed)
