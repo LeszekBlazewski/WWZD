@@ -19,9 +19,9 @@
       <n-layout-footer>
         <span>
           Made with ❤️ by
-          <a class="link" href="https://github.com/dex1g/" target="_blank"
-            >Karol Noga</a
-          >
+          <a class="link" href="https://github.com/dex1g/" target="_blank">
+            Karol Noga
+          </a>
           and
           <a
             class="link"
